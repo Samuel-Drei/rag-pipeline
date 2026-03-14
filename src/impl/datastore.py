@@ -5,7 +5,10 @@ from lancedb.table import Table
 import pyarrow as pa
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor
+import os
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv())
 
 class Datastore(BaseDatastore):
 
@@ -14,7 +17,10 @@ class Datastore(BaseDatastore):
 
     def __init__(self):
         self.vector_dimensions = 1536
-        self.open_ai_client = OpenAI()
+        self.open_ai_client = OpenAI(
+            api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    )
         self.vector_db = lancedb.connect(self.DB_PATH)
         self.table: Table = self._get_table()
 
