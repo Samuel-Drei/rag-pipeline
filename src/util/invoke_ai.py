@@ -19,7 +19,7 @@ def invoke_ai(system_message: str, user_message: str) -> str:
     )
 
     response = client.chat.completions.create(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         messages=[
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_message},
