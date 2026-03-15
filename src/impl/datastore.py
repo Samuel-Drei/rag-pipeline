@@ -5,8 +5,10 @@ from lancedb.table import Table
 import pyarrow as pa
 from openai import OpenAI
 from concurrent.futures import ThreadPoolExecutor
+from dotenv import load_dotenv, find_dotenv
 import os
 from dotenv import load_dotenv, find_dotenv
+
 
 load_dotenv(find_dotenv())
 
@@ -16,11 +18,8 @@ class Datastore(BaseDatastore):
     DB_TABLE_NAME = "rag-table"
 
     def __init__(self):
-        self.vector_dimensions = 768
-        self.open_ai_client = OpenAI(
-            api_key=os.getenv("GEMINI_API_KEY"),
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-    )
+        self.vector_dimensions = 1536
+        self.open_ai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         self.vector_db = lancedb.connect(self.DB_PATH)
         self.table: Table = self._get_table()
 
@@ -48,7 +47,7 @@ class Datastore(BaseDatastore):
     def get_vector(self, content: str) -> List[float]:
         response = self.open_ai_client.embeddings.create(
             input=content,
-            model="gemini-embedding-001",
+            model="text-embedding-3-small",
             dimensions=self.vector_dimensions,
         )
         embeddings = response.data[0].embedding
