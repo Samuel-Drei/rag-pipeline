@@ -31,13 +31,14 @@ The RAG Framework lets you:
 ##  Quick Start
 
 ### 1. Clone & Setup
-```bash
+```
 git clone https://github.com/Samuel-Drei/rag-pipeline.git
 cd rag-pipeline
 python3 -m venv venv
 source venv/bin/activate      # Linux/Mac
 # venv\Scripts\activate     # Windows
 pip install -r requirements.txt
+```
 
 Configure API Keys (.env)
 
