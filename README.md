@@ -44,6 +44,7 @@ Configure API Keys (.env)
 
 text
 OPENAI_API_KEY=sk-proj-your-key-here
+
 CO_API_KEY=your-cohere-key-here
 
 You will also need a Cohere key for the re-ranking feature used in `src/impl/retriever.py`. You can create an account and create an API key at https://cohere.com/
