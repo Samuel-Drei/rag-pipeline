@@ -8,18 +8,29 @@ from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv, find_dotenv
 import os
 from dotenv import load_dotenv, find_dotenv
+import streamlit as st
 
 
 load_dotenv(find_dotenv())
+
+
+def _get_api_key():
+    try:
+        return st.secrets["OPENAI_API_KEY"]
+    except:
+        return os.getenv("OPENAI_API_KEY")
+        
 
 class Datastore(BaseDatastore):
 
     DB_PATH = "data/sample-lancedb"
     DB_TABLE_NAME = "rag-table"
 
+
+
     def __init__(self):
         self.vector_dimensions = 1536
-        self.open_ai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        self.open_ai_client = OpenAI(api_key=_get_api_key())
         self.vector_db = lancedb.connect(self.DB_PATH)
         self.table: Table = self._get_table()
 

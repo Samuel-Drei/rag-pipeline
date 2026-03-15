@@ -4,13 +4,21 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import os
 import json
+import streamlit as st
 
 load_dotenv()
+
+def _get_api_key():
+    try:
+        return st.secrets["OPENAI_API_KEY"]
+    except:
+        return os.getenv("OPENAI_API_KEY")
+   
 
 class Retriever(BaseRetriever):
     def __init__(self, datastore: BaseDatastore):
         self.datastore = datastore
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(api_key=_get_api_key())
 
     def search(self, query: str, top_k: int = 10) -> list[str]:
         search_results = self.datastore.search(query, top_k=top_k * 3)
