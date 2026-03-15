@@ -1,14 +1,16 @@
 from interface.base_datastore import BaseDatastore
 from interface.base_retriever import BaseRetriever
 from dotenv import load_dotenv
-import cohere
+from openai import OpenAI
 import os
+import json
 
 load_dotenv()
 
 class Retriever(BaseRetriever):
     def __init__(self, datastore: BaseDatastore):
         self.datastore = datastore
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     def search(self, query: str, top_k: int = 10) -> list[str]:
         search_results = self.datastore.search(query, top_k=top_k * 3)
@@ -18,15 +20,29 @@ class Retriever(BaseRetriever):
     def _rerank(
         self, query: str, search_results: list[str], top_k: int = 10
     ) -> list[str]:
+        # Monta o prompt pedindo ao GPT para ordenar por relevância
+        numbered_docs = "\n\n".join(
+            f"[{i}] {doc}" for i, doc in enumerate(search_results)
+        )
+        prompt = f"""Given the query below, rank the documents by relevance.
+Return ONLY a JSON array with the indices of the top {top_k} most relevant documents, ordered from most to least relevant.
+Example: [2, 0, 5, 1, 3]
 
-        co = cohere.ClientV2(api_key=os.getenv("CO_API_KEY"))
-        response = co.rerank(
-            model="rerank-v3.5",
-            query=query,
-            documents=search_results,
-            top_n=top_k,
+Query: {query}
+
+Documents:
+{numbered_docs}"""
+
+        response = self.client.chat.completions.create(
+            model="gpt-5-mini",
+            messages=[{"role": "user", "content": prompt}],
         )
 
-        result_indices = [result.index for result in response.results]
+        raw = response.choices[0].message.content.strip()
+        # Extrai o JSON da resposta
+        start = raw.find("[")
+        end = raw.rfind("]") + 1
+        result_indices = json.loads(raw[start:end])[:top_k]
+
         print(f"✅ Reranked Indices: {result_indices}")
         return [search_results[i] for i in result_indices]
