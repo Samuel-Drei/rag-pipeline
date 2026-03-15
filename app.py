@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from main import create_pipeline
 
 st.set_page_config(page_title="RAG Pipeline", page_icon="🔍")
-st.title("🔍 RAG Pipeline")
+st.title("🔍 RAG Pipeline - IF")
 st.write("Faça perguntas sobre os documentos indexados.")
 
 @st.cache_resource
