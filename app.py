@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 st.set_page_config(page_title="RAG Pipeline v2.0", page_icon="🔍")
 
 st.title("🔍 RAG Pipeline v2.0")
-st.info("88% accuracy | 5.2s avg response")
+st.info("88% accuracy")
 
 # PASSO 1: SEMPRE VERIFICA DB
 db_path = "data/sample-lancedb/rag-table.lance"
@@ -29,13 +29,12 @@ else:
     pipeline = create_pipeline()
 
 # PASSO 3: QUERY
-question = st.text_input("👇 Pergunte sobre os PDFs:", key="q")
+question = st.text_input("👇 Pergunte sobre Swan Lagoon:", key="q")
 if st.button("🔍 Buscar", type="primary") and question:
     with st.spinner("🤖 RAG processando..."):
         answer = pipeline.process_query(question)
     
-    st.success("✅ **Resposta:**")
-    st.markdown(answer)
+    st.sucess(answer)
 
 st.sidebar.title("📊 Status")
 st.sidebar.success("✅ DB: OK" if os.path.exists(db_path) else "❌ Vazia")
