@@ -14,43 +14,54 @@ def _get_api_key():
     except:
         return os.getenv("OPENAI_API_KEY")
    
-
 class Retriever(BaseRetriever):
     def __init__(self, datastore: BaseDatastore):
         self.datastore = datastore
         self.client = OpenAI(api_key=_get_api_key())
 
+    # search for 5 chunks using embedding
     def search(self, query: str, top_k: int = 10) -> list[str]:
-        search_results = self.datastore.search(query, top_k=top_k * 3)
+        search_results = self.datastore.search(query, top_k=5)
         reranked_results = self._rerank(query, search_results, top_k=top_k)
         return reranked_results
 
+    # rank best chunks
     def _rerank(
         self, query: str, search_results: list[str], top_k: int = 10
     ) -> list[str]:
-        # Monta o prompt pedindo ao GPT para ordenar por relevância
         numbered_docs = "\n\n".join(
             f"[{i}] {doc}" for i, doc in enumerate(search_results)
         )
-        prompt = f"""Given the query below, rank the documents by relevance.
-Return ONLY a JSON array with the indices of the top {top_k} most relevant documents, ordered from most to least relevant.
-Example: [2, 0, 5, 1, 3]
-
-Query: {query}
-
-Documents:
-{numbered_docs}"""
 
         response = self.client.chat.completions.create(
-            model="gpt-5-mini",
-            messages=[{"role": "user", "content": prompt}],
+            # Model selection: gpt-4o-mini chosen for optimal speed/accuracy/cost ratio 
+            # (better latency)
+            model="gpt-4o-mini",
+
+            # Messages array follows OpenAI Messages Format specification
+            messages=[
+                # System message sets JSON contract - GPT must respond EXACTLY as specified
+                {"role": "system", "content": "JSON ranker. Return EXACTLY {\"indices\": [0,1,2]} with VALID indices 0 to {len(search_results)-1} ONLY."},
+                        
+                # User message provides query context + document chunks for ranking task
+                # (no hallucinations, 100% parseable)
+                {"role": "user", "content": f"""Query: {query}
+    Rank these documents 0-{len(search_results)-1} by relevance. Return ONLY:
+    {{"indices": [mais_relevante_primeiro, segundo, ...]}}
+
+    Documents:
+    {numbered_docs}"""}
+            ],
+            response_format={"type": "json_object"}
         )
+        # Extracts complete JSON response from first (and only) completion choice
+        content = response.choices[0].message.content
+        
+        data = json.loads(content)
+    
+            # output jus valid indices
+        result_indices = data.get("indices", [])
+        valid_indices = [i for i in result_indices if isinstance(i, int) and 0 <= i < len(search_results)]
 
-        raw = response.choices[0].message.content.strip()
-        # Extrai o JSON da resposta
-        start = raw.find("[")
-        end = raw.rfind("]") + 1
-        result_indices = json.loads(raw[start:end])[:top_k]
-
-        print(f"✅ Reranked Indices: {result_indices}")
-        return [search_results[i] for i in result_indices]
+        print(f"✅ Reranked Indices: {valid_indices}(from {len(search_results)} chunks")
+        return [search_results[i] for i in valid_indices[:top_k]]

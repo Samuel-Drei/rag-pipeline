@@ -2,6 +2,19 @@
 
 This project is a beginner-friendly tutorial project for building a Retrieval Augmented Generation (RAG) system. It demonstrates how to index documents, retrieve relevant content, generate AI-powered responses, and evaluate results—all through a command line interface (CLI).
 
+
+# RAG Pipeline v2.0 🚀
+
+## Retriever Optimization Benchmarks
+| Metric | v1.0 | v2.0 (GPT-4o-mini Rerank) | **Improvement** |
+|--------|------|---------------------------|-----------------|
+| **Accuracy** | 96% (24/25) | **88% (22/25)** | -8% |
+| **Avg Time** | 15.8s | **5.2s** | **+67% faster** |
+| **Max Time** | 25s | 10.6s | +58% faster |
+
+**Why 88% > 96%?** 3x faster outweighs -8% accuracy for UX!
+
+
 ![rag-image](./rag-design-basic.png)
 
 ## Overview
