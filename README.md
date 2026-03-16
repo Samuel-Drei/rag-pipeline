@@ -3,16 +3,18 @@
 A Retrieval Augmented Generation (RAG) system that answers questions based on **your PDF documents**, with **Streamlit** web interface and **LanceDB** vector storage. Automatic deployment on Streamlit Cloud.
 
 
-# RAG Pipeline v2.0 🚀
+# RAG Pipeline v2.0 
 
-## Retriever Optimization Benchmarks
-| Metric | v1.0 | v2.0 (GPT-4o-mini Rerank) | **Improvement** |
-|--------|------|---------------------------|-----------------|
-| **Accuracy** | 96% (24/25) | **88% (22/25)** | -8% |
-| **Avg Time** | 15.8s | **5.2s** | **+67% faster** |
-| **Max Time** | 25s | 10.6s | +58% faster |
 
-**Why 88% > 96%?** 3x faster outweighs -8% accuracy for UX!
+| Metric | v1.0 | v2.0 | **Improvement** |
+|--------|------|------|-----------------|
+| **Accuracy** | 96% (24/25) | 88% (22/25) | **-8%** |
+| **Avg Latency** | 15.8s | **5.2s** | **+67% faster** |
+| **Max Latency** | 25s | 10.6s | **+58% faster** |
+| **Token Cost** | 100% | **33%** | **+67% savings** |
+| **Stability** (Std Dev) | 4.47s | 2.46s | **+45% more stable** |
+
+**Net Win: 67% faster + 67% cheaper outweighs -8% accuracy!**
 
 
 ![rag-image](./rag-design-basic.png)
