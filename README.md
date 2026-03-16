@@ -1,6 +1,6 @@
 # Simple RAG Pipeline
 
-This project is a beginner-friendly tutorial project for building a Retrieval Augmented Generation (RAG) system. It demonstrates how to index documents, retrieve relevant content, generate AI-powered responses, and evaluate results—all through a command line interface (CLI).
+A Retrieval Augmented Generation (RAG) system that answers questions based on **your PDF documents**, with **Streamlit** web interface and **LanceDB** vector storage. Automatic deployment on Streamlit Cloud.
 
 
 # RAG Pipeline v2.0 🚀
@@ -22,9 +22,10 @@ This project is a beginner-friendly tutorial project for building a Retrieval Au
 The RAG Framework lets you:
 
 - **Index Documents:** Process and break documents (e.g., PDFs) into smaller, manageable chunks.
-- **Store & Retrieve Information:** Save document embeddings in a vector database (using LanceDB) and search using similarity.
+- **Store & Retrieve Information:** Save document embeddings in a vector database (using LanceDB) and search using  similarity search + Cohere rerank.
 - **Generate Responses:** Use an AI model (via the OpenAI API) to provide concise answers based on the retrieved context.
 - **Evaluate Responses:** Compare the generated response against expected answers and view the reasoning behind the evaluation.
+- **Web interface** → Streamlit (local + cloud)
 
 ## Architecture
 
@@ -40,28 +41,24 @@ The RAG Framework lets you:
 - **Interfaces (interface/):**  
   Abstract base classes define contracts for all components (e.g., BaseDatastore, BaseIndexer, BaseRetriever, BaseResponseGenerator, and BaseEvaluator), making it easy to extend or swap implementations.
 
-## Installation
+##  Quick Start
 
-#### Set Up a Virtual Environment (Optional but Recommended)
-
-```bash
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
+### 1. Clone & Setup
 ```
-
-#### Install Dependencies
-
-```bash
+git clone https://github.com/Samuel-Drei/rag-pipeline.git
+cd rag-pipeline
+python3 -m venv venv
+source venv/bin/activate      # Linux/Mac
+# venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-#### Configure Environment Variables
+Configure API Keys (.env)
 
-We use OpenAI for the LLM (you can modify/replace it in `src/util/invoke_ai.py`). Make sure to set your OpenAI API key. For example:
+text
+OPENAI_API_KEY=sk-proj-your-key-here
 
-```sh
-export OPENAI_API_KEY='your_openai_api_key'
-```
+CO_API_KEY=your-cohere-key-here
 
 You will also need a Cohere key for the re-ranking feature used in `src/impl/retriever.py`. You can create an account and create an API key at https://cohere.com/
 
@@ -116,4 +113,21 @@ Use a JSON file (with question/answer pairs) to evaluate the response quality.
 
 ```bash
 python main.py evaluate -f "sample_data/eval/sample_questions.json"
+
+#### Run locally
+
+streamlit run app.py
+
+Opens localhost:8501
+
+
+#### Streamlit Cloud Deployment
+
+    Push to GitHub → auto-detected
+
+    Streamlit Cloud → Settings → Secrets:
+
+
+OPENAI_API_KEY = "sk-proj-..."
+CO_API_KEY = "co-..."
 ```
